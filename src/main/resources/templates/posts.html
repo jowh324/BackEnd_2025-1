@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+</head>
+<body>
+<h1 th:text="${boardName}">자유게시판</h1>
+<div th:each="post : ${posts}">
+  <h2 th:text="${post.title}">제목</h2>
+  <p><span th:text="${post.name}">작성자</span> | <span th:text="${post.date}">날짜</span></p>
+  <p th:text="${post.content}">내용</p>
+</div>
+</body>
+</html>
+

@@ -13,12 +13,18 @@ import java.util.Map;
 public class HelloController {
 
 
-    @GetMapping("/introduce")
-    public String introduce(@RequestParam(name="name" , required=false, defaultValue = "조원희") String name, Model model) {
-        model.addAttribute("name", name);
-        return "hello";
+    //@GetMapping("/introduce")
+    //public String introduce(@RequestParam(name="name" , required=false, defaultValue = "조원희") String name, Model model) {
+    //  model.addAttribute("name", name);
+    //return "hello";
 
+    //}
+    @GetMapping("/introduce")
+    public String introduce() {
+        // Thymeleaf가 templates/introduce.html 을 렌더링
+        return "hello";
     }
+
     @GetMapping("/json")
     @ResponseBody
     public Map<String, Object> json() {

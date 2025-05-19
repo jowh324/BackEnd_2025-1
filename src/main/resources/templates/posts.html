@@ -2,14 +2,19 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Title</title>
+  <title>Board Posts</title>
 </head>
 <body>
-<h1 th:text="${boardName}">자유게시판</h1>
+<h1 th:text="${boardName}">게시판 이름</h1>
 <div th:each="post : ${posts}">
   <h2 th:text="${post.title}">제목</h2>
-  <p><span th:text="${post.name}">작성자</span> | <span th:text="${post.date}">날짜</span></p>
-  <p th:text="${post.content}">내용</p>
+  <p>
+    <span th:text="'작성자'+${post.author_id}">작성자</span> |
+    <span th:text="'게시물'+${post.id}">게시물</span> |
+    <span th:text="'게시된 날짜'+${post.created_date}">게시된 날짜</span>
+    <span th:text="'수정된 날짜'${post.modified_date}">수정된 날짜</span>
+  </p>
+  <div th:text="${post.content}">내용</div>
 </div>
 </body>
 </html>

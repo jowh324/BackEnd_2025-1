@@ -2,10 +2,8 @@ package com.example.bcsd.repository;
 
 import com.example.bcsd.Dao.ArticleDao;
 import com.example.bcsd.Model.Article;
-import com.example.bcsd.expection.expection;
 import com.example.bcsd.mapper.articlemapper;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -31,13 +29,12 @@ public class ArticleRepository implements ArticleDao {
 
     @Override
     public Article findById(long id) {
-        try {
-            String sql = "SELECT * FROM article where id=? ";
-            return jdbcTemplate.queryForObject(sql, new articlemapper(), id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new expection("Article id=" + id + " not found");        }
-    }
 
+        String sql = "SELECT * FROM article where id=? ";
+        return jdbcTemplate.queryForObject(sql, new articlemapper(), id);
+
+
+    }
     @Override
     public Article insert(Article article) {
         String sql = """
@@ -70,7 +67,7 @@ public class ArticleRepository implements ArticleDao {
             """;
         return jdbcTemplate.update(sql, article.getTitle(), article.getContent(), article.getId());
     }
-    public int delete(long id) {
-        return jdbcTemplate.update("delete from article where id = ?", id);
+    public boolean delete(long id) {
+        return jdbcTemplate.update("delete from article where id = ?", id)>0;
     }
 }

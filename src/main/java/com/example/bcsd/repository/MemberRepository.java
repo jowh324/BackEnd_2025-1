@@ -2,10 +2,8 @@ package com.example.bcsd.repository;
 
 import com.example.bcsd.Dao.MemberDao;
 import com.example.bcsd.Model.Member;
-import com.example.bcsd.expection.expection;
 import com.example.bcsd.mapper.membermapper;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+
 @Repository
 public class MemberRepository implements MemberDao {
     private final JdbcTemplate jdbcTemplate;
@@ -29,11 +28,10 @@ public class MemberRepository implements MemberDao {
 
     @Override
     public Member findById(long id) {
-        try {
-            String sql = "SELECT * FROM member where id=? ";
-            return jdbcTemplate.queryForObject(sql, new membermapper(), id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new expection("Member id=" + id + " not found");        }
+
+        String sql = "SELECT * FROM member where id=? ";
+        return jdbcTemplate.queryForObject(sql, new membermapper(), id);
+
     }
 
     @Override
@@ -51,21 +49,24 @@ public class MemberRepository implements MemberDao {
             ps.setString(3, member.getPassword());
 
             return ps;
-        },keyHolder);
+        }, keyHolder);
         if (keyHolder != null) {
             member.setId(keyHolder.getKey().longValue());
         } else {
             throw new DataRetrievalFailureException("Failed to retrieve generated key for Member");
-        }        return member;
+        }
+        return member;
     }
+
     public int update(Member member) {
         String sql = """
-            UPDATE member
-               SET name = ?, email = ?, password = ?
-             WHERE id = ?
-            """;
-        return jdbcTemplate.update(sql, member.getName(),member.getEmail(),member.getPassword(),member.getId());
+                UPDATE member
+                   SET name = ?, email = ?, password = ?
+                 WHERE id = ?
+                """;
+        return jdbcTemplate.update(sql, member.getName(), member.getEmail(), member.getPassword(), member.getId());
     }
+
     public int delete(long id) {
         return jdbcTemplate.update("delete from member where id = ?", id);
     }

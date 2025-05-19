@@ -13,5 +13,5 @@ public interface ArticleDao {
 
     int update(Article article);
 
-    int delete(long id);
+    boolean delete(long id);
 }

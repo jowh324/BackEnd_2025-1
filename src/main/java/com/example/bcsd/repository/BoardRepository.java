@@ -60,7 +60,7 @@ public class BoardRepository implements BoardDao {
          return board;
     }
 
-    public int delete(long id) {
-        return jdbcTemplate.update("delete from member where id = ?", id);
+    public boolean delete(long id) {
+        return jdbcTemplate.update("delete from member where id = ?", id)>0;
     }
 }

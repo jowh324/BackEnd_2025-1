@@ -2,47 +2,44 @@ package com.example.bcsd.controller;
 
 
 import com.example.bcsd.Dao.MemberDao;
-import com.example.bcsd.Model.Article;
+import com.example.bcsd.Dto.ArticleUpdate;
+import com.example.bcsd.Dto.MemberCreate;
+import com.example.bcsd.Dto.MemberResponse;
+import com.example.bcsd.Dto.MemberUpdate;
 import com.example.bcsd.Model.Member;
 
+import com.example.bcsd.Service.MemberService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class MemberController {
-    private MemberDao memberDao;
-    public MemberController(MemberDao memberDao) {
-        this.memberDao = memberDao;
+    private final MemberService memberService;
+    public MemberController(MemberService memberService) {
+        this.memberService = memberService;
     }
 
     @PostMapping("/member")
-    public ResponseEntity<Member> addMember(@RequestBody Member member) {
-        Member newMember = memberDao.insert(member);
-        return ResponseEntity.ok(member);
+    public ResponseEntity<MemberResponse> addMember(@Valid @RequestBody MemberCreate member) {
+        MemberResponse newMember = memberService.insertMember(member);
+        return ResponseEntity.created(URI.create("/"+newMember.id())).body(newMember);
     }
     @PutMapping("/member/{id}")
-    public ResponseEntity<Member> updateMember(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+    public ResponseEntity<MemberResponse> updateMember(@PathVariable Long id, @RequestBody MemberUpdate update) {
+        MemberResponse reponse= memberService.updateMember(update,id);
 
-        Member member = memberDao.findById(id);
-        if (member == null) {
-            return ResponseEntity.notFound().build();
-        }
-        member.setPassword((String) payload.get("password"));
-        member.setEmail((String) payload.get("email"));
-        member.setName((String) payload.get("name"));
-        memberDao.update(member);
         // 변경된 정보를 다시 조회해서 돌려줄 수도 있습니다.
-        return ResponseEntity.ok(memberDao.findById(id));
+        return ResponseEntity.ok(reponse);
     }
 
     @DeleteMapping("/member/{id}")
     public ResponseEntity<Void> deleteMember(@PathVariable Long id) {
-        int row = memberDao.delete(id);
-        if (row == 0) {
-            ResponseEntity.notFound().build();
-        }
+       memberService.deleteMember(id);
 
         return ResponseEntity.noContent().build();
     }

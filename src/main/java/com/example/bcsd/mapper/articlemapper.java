@@ -3,11 +3,13 @@ package com.example.bcsd.mapper;
 import com.example.bcsd.Model.Article;
 import com.example.bcsd.repository.ArticleRepository;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+@Component
 public class articlemapper implements RowMapper<Article> {
     public Article mapRow(ResultSet rs, int rowNum) throws SQLException {
         Article article = new Article();

@@ -1,61 +1,120 @@
 package com.example.bcsd.Service;
 
 import com.example.bcsd.Dao.ArticleDao;
+import com.example.bcsd.Dao.BoardDao;
+import com.example.bcsd.Dao.MemberDao;
+import com.example.bcsd.Dto.ArticleCreate;
+import com.example.bcsd.Dto.ArticleResponse;
+import com.example.bcsd.Dto.ArticleUpdate;
 import com.example.bcsd.Model.Article;
-import com.example.bcsd.repository.ArticleRepository;
+import com.example.bcsd.Model.Board;
+import com.example.bcsd.Model.Member;
+import jakarta.persistence.EntityNotFoundException;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ArticleService {
-    private final ArticleRepository articleRepository;
+    private final ArticleDao articleDao;
+    private final MemberDao memberDao;
+    private final BoardDao boardDao;
+    public ArticleService(ArticleDao articleDao, MemberDao memberDao, BoardDao boardDao) {
+        this.articleDao = articleDao;
+        this.memberDao = memberDao;
+        this.boardDao = boardDao;
 
-
-    public ArticleService(ArticleRepository articleRepository) {
-        this.articleRepository = articleRepository;
     }
 
-    public List<Article> getArticlesByBoardId(Long board_id) {
-        return articleRepository.findByBoardId(board_id);
+
+    public List<ArticleResponse> getArticlesByBoardId(Long board_id) {
+       if(articleDao.findByBoardId(board_id)==null){
+           throw new EntityNotFoundException("Article Not Found"+"(board_id:"+board_id+")");}
+        return articleDao.findByBoardId(board_id).stream().map(a -> ArticleResponse.of(
+                        a.getId(),
+                        a.getBoard_id(),
+                        a.getAuthor_id(),
+                        a.getTitle(),
+                        a.getContent(),
+                        a.getCreated_date(),
+                        a.getModified_date()
+                ))
+                .collect(Collectors.toList());
     }
 
-    public ResponseEntity<Article> getArticleById(Long id) {
-        Article article = articleRepository.findById(id);
-        if (article == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(article);
+    public ArticleResponse getArticleById(Long id) {
+        Article article = articleDao.findById(id).orElseThrow(() -> new EntityNotFoundException("Article with id: " + id + " not found!"));
+        return ArticleResponse.of(article.getId(),
+                article.getBoard_id(),
+                article.getAuthor_id(),
+                article.getTitle(),
+                article.getContent(),
+                article.getCreated_date(),
+                article.getModified_date());
+
     }
 
     @Transactional
-    public ResponseEntity<Article> createArticle(Article article) {
-        articleRepository.insert(article);
-        return ResponseEntity.ok(article);
+    public ArticleResponse createArticle(ArticleCreate request) throws IllegalAccessException {
+        memberDao.findById(request.author_id())
+                .orElseThrow(() -> new IllegalAccessException("존재하지 않는 사용자입니다"));
+        boardDao.findById(request.board_id())
+                .orElseThrow(() -> new IllegalAccessException("존재하지 않는 게시판입니다"));
+
+
+
+        Article toSave = new Article();
+        toSave.setBoard_id(request.board_id());
+        toSave.setAuthor_id(request.author_id());
+        toSave.setTitle(request.title());
+        toSave.setContent(request.content());
+        LocalDateTime now = LocalDateTime.now();
+        toSave.setCreated_date(now);
+        toSave.setModified_date(now);
+
+        Article saved = articleDao.insert(toSave);
+
+        return ArticleResponse.of(
+                saved.getId(),
+                saved.getBoard_id(),
+                saved.getAuthor_id(),
+                saved.getTitle(),
+                saved.getContent(),
+                saved.getCreated_date(),
+                saved.getModified_date()
+        );
+
     }
 
     @Transactional
-    public ResponseEntity<Article> updateArticle(Article article, Long id) {
-        Article articles = articleRepository.findById(id);
-        if (articles == null) {
-            return ResponseEntity.notFound().build();
+    public ArticleResponse updateArticle(ArticleUpdate update, Long id) throws IllegalAccessException {
+        Article articles = articleDao.findById(id).orElseThrow(() -> new IllegalAccessException("Article not found: " + id));
+
+        if(update.title() != null && !update.title().isBlank()) {
+            articles.setTitle(update.title());
         }
-        articles.setTitle((String) article.getTitle());
-        articles.setContent((String) article.getContent());
+        if(update.content() != null && !update.content().isBlank()) {
+            articles.setContent(update.content());
+        }
         articles.setModified_date(LocalDateTime.now());
-        articleRepository.update(articles);
-        // 변경된 정보를 다시 조회해서 돌려줄 수도 있습니다.
-        return ResponseEntity.ok(articleRepository.findById(id));
+        articleDao.update(articles);
+        return ArticleResponse.of(articles.getId(),
+                articles.getBoard_id(),
+                articles.getAuthor_id(),
+                articles.getTitle(),
+                articles.getContent(),
+                articles.getCreated_date(),
+                articles.getModified_date());
     }
 
     @Transactional
     public void deleteArticle(Long id) {
-        if (!articleRepository.delete(id)) {
+        if (!articleDao.delete(id)) {
             throw new NullPointerException("해당 id가 존재하지 않습니다.");
         }
     }

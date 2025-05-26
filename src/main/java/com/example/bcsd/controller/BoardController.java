@@ -1,10 +1,14 @@
 package com.example.bcsd.controller;
 
+import com.example.bcsd.Dto.BoardCreate;
+import com.example.bcsd.Dto.BoardResponse;
+import com.example.bcsd.Dto.BoardUpdate;
 import com.example.bcsd.Service.BoardService;
 import com.example.bcsd.Model.Board;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Map;
 @RestController
 public class BoardController {
@@ -13,29 +17,20 @@ public class BoardController {
         this.boardService = boardService;
     }
     @PostMapping("/board")
-    public ResponseEntity<Board> addBoard(@RequestBody Board board) {
-        Board newBoard = boardService.insert(board);
-        return ResponseEntity.ok(board);
+    public ResponseEntity<BoardResponse> addBoard(@RequestBody BoardCreate board) {
+        BoardResponse newBoard = boardService.insert(board);
+        return ResponseEntity.created(URI.create("/board")).body(newBoard);
     }
     @PutMapping("/board/{id}")
-    public ResponseEntity<Board> uqdateBoard(@PathVariable Long id, @RequestBody Map<String, Object> payload) {
+    public ResponseEntity<BoardResponse> uqdateBoard(@PathVariable Long id, @RequestBody BoardUpdate board) {
 
-        Board board = boardService.findById(id);
-        if (board == null) {
-            return ResponseEntity.notFound().build();
-        }
-        board.setName((String) payload.get("name"));
-        boardService.update(boardService.findById(board.getId()));
-        // 변경된 정보를 다시 조회해서 돌려줄 수도 있습니다.
-        return ResponseEntity.ok(boardService.findById(id));
+       BoardResponse res=boardService.update(board,id);
+        return ResponseEntity.ok(res);
     }
 
     @DeleteMapping("/board/{id}")
-    public ResponseEntity<Void> deleteBoard(@PathVariable Long id) {
-        int row = boardService.delete(id);
-        if (row == 0) {
-            ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Void> deleteBoard(@PathVariable Long id) throws IllegalAccessException {
+        boardService.delete(id);
 
         return ResponseEntity.noContent().build();
     }

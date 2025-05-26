@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MemberRepository implements MemberDao {
@@ -20,17 +21,14 @@ public class MemberRepository implements MemberDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    @Override
-    public List<Member> findByBoardId(long id) {
-        String sql = "SELECT * FROM member where id=? ";
-        return jdbcTemplate.query(sql, new membermapper(), id);
-    }
+
 
     @Override
-    public Member findById(long id) {
+    public Optional<Member> findById(long id) {
 
         String sql = "SELECT * FROM member where id=? ";
-        return jdbcTemplate.queryForObject(sql, new membermapper(), id);
+        List<Member> members = jdbcTemplate.query(sql, new membermapper(), id);
+        return members.stream().findFirst();
 
     }
 
@@ -67,7 +65,7 @@ public class MemberRepository implements MemberDao {
         return jdbcTemplate.update(sql, member.getName(), member.getEmail(), member.getPassword(), member.getId());
     }
 
-    public int delete(long id) {
-        return jdbcTemplate.update("delete from member where id = ?", id);
+    public boolean delete(long id) {
+        return jdbcTemplate.update("delete from member where id = ?", id)>0;
     }
 }

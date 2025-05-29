@@ -31,7 +31,7 @@ public class ArticleService {
 
     }
 
-
+    @Transactional
     public List<ArticleResponse> getArticlesByBoardId(Long board_id) {
        if(articleDao.findByBoardId(board_id)==null){
            throw new EntityNotFoundException("Article Not Found"+"(board_id:"+board_id+")");}
@@ -46,9 +46,12 @@ public class ArticleService {
                 ))
                 .collect(Collectors.toList());
     }
-
+    @Transactional
     public ArticleResponse getArticleById(Long id) {
-        Article article = articleDao.findById(id).orElseThrow(() -> new EntityNotFoundException("Article with id: " + id + " not found!"));
+        if(articleDao.findById(id)==null){
+            throw new EntityNotFoundException("Article Not Found"+"(id:"+id+")");
+        }
+        Article article = articleDao.findById(id);
         return ArticleResponse.of(article.getId(),
                 article.getBoard_id(),
                 article.getAuthor_id(),
@@ -61,14 +64,16 @@ public class ArticleService {
 
     @Transactional
     public ArticleResponse createArticle(ArticleCreate request) throws IllegalAccessException {
-        memberDao.findById(request.author_id())
-                .orElseThrow(() -> new IllegalAccessException("존재하지 않는 사용자입니다"));
-        boardDao.findById(request.board_id())
-                .orElseThrow(() -> new IllegalAccessException("존재하지 않는 게시판입니다"));
+        if( memberDao.findById(request.author_id())==null){
+            throw new IllegalAccessException("Member Not Found"+"(author_id:"+request.author_id()+")");
+        }
+        if(boardDao.findById(request.board_id())==null){
+            throw new IllegalAccessException("Board Not Found"+"(id:"+request.board_id()+")");
+        }
 
 
 
-        Article toSave = new Article();
+        Article toSave = articleDao.findById(request.author_id());
         toSave.setBoard_id(request.board_id());
         toSave.setAuthor_id(request.author_id());
         toSave.setTitle(request.title());
@@ -93,7 +98,10 @@ public class ArticleService {
 
     @Transactional
     public ArticleResponse updateArticle(ArticleUpdate update, Long id) throws IllegalAccessException {
-        Article articles = articleDao.findById(id).orElseThrow(() -> new IllegalAccessException("Article not found: " + id));
+        if(articleDao.findById(id)==null){
+            throw new IllegalAccessException("Article with id: " + id + " not found!");
+        }
+        Article articles = articleDao.findById(id);
 
         if(update.title() != null && !update.title().isBlank()) {
             articles.setTitle(update.title());

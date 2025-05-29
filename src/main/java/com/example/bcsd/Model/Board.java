@@ -3,11 +3,12 @@ package com.example.bcsd.Model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "Board")
+@Table(name = "board")
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name="name")
     private String name;
 
     public Board() {

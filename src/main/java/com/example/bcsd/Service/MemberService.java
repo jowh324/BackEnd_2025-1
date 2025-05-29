@@ -22,7 +22,11 @@ public class MemberService {
         this.articleDao = articleDao;
     }
     public MemberResponse findmemberById(long id) {
-        Member member= memberDao.findById(id).orElseThrow(()->new EntityNotFoundException("Member with id: " + id + " not found!"));
+        if(memberDao.findById(id)==null){
+            throw new EntityNotFoundException("Member with id: " + id + " not found!");
+        }
+        Member member= memberDao.findById(id);
+
         return MemberResponse.of(
                 member.getId(),
                 member.getName(),
@@ -30,9 +34,9 @@ public class MemberService {
                 member.getPassword()
         );
     }
-
+    @Transactional
     public MemberResponse insertMember(MemberCreate member) {
-        if(!member.email().isEmpty()){
+        if(memberDao.findByEmail(member.email())!=null){
             throw new Emailexception(member.email());
         }
 
@@ -49,8 +53,13 @@ public class MemberService {
                 save.getPassword()
         );
     }
+    @Transactional
     public MemberResponse updateMember(MemberUpdate update,Long id) {
-        Member update1=memberDao.findById(id).orElseThrow(()->new EntityNotFoundException("Member with id: " + id + " not found!"));
+        if(memberDao.findById(id)==null){
+            throw new EntityNotFoundException("Member with id: " + id + " not found!");
+        }
+
+        Member update1=memberDao.findById(id);
         update1.setName(update.name());
         update1.setEmail(update.email());
         update1.setPassword(update.password());

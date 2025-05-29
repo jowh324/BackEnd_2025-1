@@ -2,6 +2,7 @@ package com.example.bcsd.Dto;
 
 import com.example.bcsd.Model.Article;
 import com.example.bcsd.Model.Article;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public record ArticleCreate(
@@ -9,9 +10,9 @@ public record ArticleCreate(
         Long board_id,
         @NotNull (message = "author_id cannot be null")
         Long author_id,
-        @NotNull (message = "title cannot be null")
+        @NotBlank (message = "title cannot be null")
         String title,
-        @NotNull (message = "content cannot be null")
+        @NotBlank (message = "content cannot be null")
         String content) {
 
 

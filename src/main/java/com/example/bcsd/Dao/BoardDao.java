@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface BoardDao {
 
-    Optional<Board> findById(long id);
+    Board findById(long id);
 
     Board insert(Board board);
 

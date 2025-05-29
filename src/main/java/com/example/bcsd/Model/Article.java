@@ -14,16 +14,23 @@ import java.time.LocalDateTime;
 @Table(name = "article")
 @EntityListeners(AuditingEntityListener.class)
 public class Article {
+    @Column(name="title")
     private String title;
     @Lob
+    @Column(name="content")
     private String content;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
     private Long id;
+    @Column(name="author_id")
     private Long author_id;
+    @Column(name="board_id")
     private Long board_id;
+    @Column(name="created_date")
     @CreatedDate
     private LocalDateTime created_date;
+    @Column(name="modified_date")
     @LastModifiedDate
     private LocalDateTime modified_date;
 

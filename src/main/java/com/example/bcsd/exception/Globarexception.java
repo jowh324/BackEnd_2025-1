@@ -8,15 +8,26 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
 @RestControllerAdvice
 public class Globarexception {
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String,String> handleValidation(MethodArgumentNotValidException ex) {
+        return ex.getBindingResult().getFieldErrors().stream()
+                .collect(Collectors.toMap(
+                        fe -> fe.getField(),
+                        fe -> fe.getDefaultMessage()
+                ));
+    }
     //400
     @ExceptionHandler(IllegalAccessException.class)
     public ResponseEntity<String> handleIllegalAccess(IllegalAccessException ex) {
@@ -46,5 +57,6 @@ public class Globarexception {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
+
 
 }

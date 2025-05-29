@@ -8,11 +8,11 @@ import java.util.Optional;
 public interface ArticleDao {
     List<Article> findByBoardId(long board_id);
     List<Article> findByAuthorId(long author_id);
-    Optional<Article> findById(long id);
+    Article findById(long id);
 
     Article insert(Article article);
 
-    int update(Article article);
+    Article update(Article article);
 
     boolean delete(long id);
 }

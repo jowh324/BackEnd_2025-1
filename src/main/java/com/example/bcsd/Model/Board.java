@@ -2,14 +2,21 @@ package com.example.bcsd.Model;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "board")
 public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
+
+    @OneToMany(mappedBy = "board", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY
+    )
+    private List<Article> articles = new ArrayList<>();
 
     public Board() {
     }

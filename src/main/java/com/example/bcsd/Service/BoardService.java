@@ -5,6 +5,7 @@ import com.example.bcsd.Dao.BoardDao;
 import com.example.bcsd.Dto.BoardCreate;
 import com.example.bcsd.Dto.BoardResponse;
 import com.example.bcsd.Dto.BoardUpdate;
+import com.example.bcsd.Model.Article;
 import com.example.bcsd.Model.Board;
 import com.example.bcsd.repository.BoardRepository;
 import jakarta.persistence.EntityExistsException;
@@ -76,5 +77,6 @@ public class BoardService {
             throw new EntityNotFoundException("해당 id가 존재하지 않습니다.");
         }
     }
+
 
 }

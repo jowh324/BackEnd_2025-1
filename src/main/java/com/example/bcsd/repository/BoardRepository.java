@@ -1,17 +1,11 @@
 package com.example.bcsd.repository;
 
 import com.example.bcsd.Dao.BoardDao;
+import com.example.bcsd.Model.Article;
 import com.example.bcsd.Model.Board;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-
-import java.sql.PreparedStatement;
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public class BoardRepository implements BoardDao {
@@ -44,4 +38,5 @@ public class BoardRepository implements BoardDao {
        }
         return  false;
     }
+
 }

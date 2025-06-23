@@ -1,13 +1,11 @@
 package com.example.bcsd.Model;
 
 
-import com.example.bcsd.repository.ArticleRepository;
 import jakarta.persistence.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -33,7 +31,12 @@ public class Article {
     @Column(name="modified_date")
     @LastModifiedDate
     private LocalDateTime modified_date;
-
+    @ManyToOne(fetch= FetchType.LAZY)
+    @JoinColumn(name="board_id")
+    private Board board;
+    public void Board(Board board){
+        this.board = board;
+    }
     public Article() {
     }
 

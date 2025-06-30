@@ -1,7 +1,6 @@
 package com.example.bcsd.repository;
 
 import com.example.bcsd.Dao.MemberDao;
-import com.example.bcsd.Model.Article;
 import com.example.bcsd.Model.Board;
 import com.example.bcsd.Model.Member;
 import jakarta.persistence.EntityManager;
@@ -21,6 +20,8 @@ public class MemberRepository implements MemberDao {
         return em.find(Member.class, id);
 
     }
+
+
     @Override
     public Member findByEmail(String email) {
 

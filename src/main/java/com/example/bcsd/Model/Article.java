@@ -23,7 +23,7 @@ public class Article {
     private Long id;
     @Column(name="author_id")
     private Long author_id;
-    @Column(name="board_id")
+    @Column(name="board_id",insertable = false, updatable = false)
     private Long board_id;
     @Column(name="created_date")
     @CreatedDate

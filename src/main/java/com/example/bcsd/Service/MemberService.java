@@ -2,24 +2,29 @@ package com.example.bcsd.Service;
 
 import com.example.bcsd.Dao.ArticleDao;
 import com.example.bcsd.Dao.MemberDao;
-import com.example.bcsd.Dto.MemberCreate;
-import com.example.bcsd.Dto.MemberResponse;
-import com.example.bcsd.Dto.MemberUpdate;
+import com.example.bcsd.Dto.*;
 import com.example.bcsd.Model.Member;
 import com.example.bcsd.exception.Emailexception;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
 
 @Service
 public class MemberService {
     private final ArticleDao articleDao;
     private final MemberDao memberDao;
-    public MemberService(MemberDao memberDao, ArticleDao articleDao) {
+    private final PasswordEncoder passwordEncoder;
+    public MemberService(MemberDao memberDao, ArticleDao articleDao, PasswordEncoder passwordEncoder) {
         this.memberDao = memberDao;
         this.articleDao = articleDao;
+        this.passwordEncoder = passwordEncoder;
     }
     public MemberResponse findmemberById(long id) {
         if(memberDao.findById(id)==null){
@@ -84,6 +89,17 @@ public class MemberService {
         }
 
     }
+    @Transactional
+    public LoginResponse login(loginRequest loginRequest) {
+        Member member=memberDao.findByEmail(loginRequest.email());
+        if(member==null){
+            throw new Emailexception(loginRequest.email());
+        }
+        if(!passwordEncoder.matches(loginRequest.password(), member.getPassword())){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다.");        }
+        return LoginResponse.of(member.getEmail());
+    }
+
 
 
 }
